@@ -1,0 +1,13 @@
+MOTORS
+    CMD
+        0: FRONT LEFT
+        1: BACK LEFT
+        2: FRONT RIGHT
+        3: BACK RIGHT
+    EXP
+        0:
+        1:
+        2:
+        3:
+SERVOS
+
