@@ -1,13 +1,13 @@
 MOTORS
-    CMD
-        0: FRONT LEFT
-        1: BACK LEFT
-        2: FRONT RIGHT
-        3: BACK RIGHT
-    EXP
-        0:
-        1:
-        2:
+    CMD HUB
+        0: FRONT LEFT DRIVE
+        1: BACK LEFT DRIVE
+        2: LEFT SLIDE
+        3:
+    EXP HUB
+        0: FRONT RIGHT DRIVE
+        1: BACK RIGHT DRIVE
+        2: RIGHT SLIDE
         3:
 SERVOS
 

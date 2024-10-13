@@ -5,9 +5,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Autonomous(name="Playground_Auto")
-public class PlaygroundAuto extends LinearOpMode {
+public class playgroundAuto extends LinearOpMode {
 
-    private autoFrame kevinFrame;
+    private testAutoFrame kevinFrame;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -15,17 +15,17 @@ public class PlaygroundAuto extends LinearOpMode {
         DcMotorEx frontRight = hardwareMap.get(DcMotorEx.class, "frontRight");
         DcMotorEx backLeft = hardwareMap.get(DcMotorEx.class, "backLeft");
         DcMotorEx backRight = hardwareMap.get(DcMotorEx.class, "backRight");
+        DcMotorEx leftSlide = hardwareMap.get(DcMotorEx.class, "leftSlide");
+        DcMotorEx rightSlide = hardwareMap.get(DcMotorEx.class, "rightSlide");
 
-        kevinFrame = new autoFrame(frontLeft,frontRight,backLeft,backRight);
+        kevinFrame = new testAutoFrame(frontLeft,frontRight,backLeft,backRight,leftSlide,rightSlide);
 
         waitForStart();
 
         kevinFrame.resetEncoders();
+        kevinFrame.resetSlides();
 
-        kevinFrame.forward(10, 0.5);
-        kevinFrame.right(10,0.5);
-        kevinFrame.right(-10,0.5);
-        kevinFrame.rotate(90,0.5);
+        kevinFrame.slides(0.5, 0.25);
 
     }
 }
