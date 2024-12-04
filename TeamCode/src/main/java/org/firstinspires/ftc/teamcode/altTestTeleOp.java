@@ -6,8 +6,9 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@TeleOp(name="Arm Test TeleOp")
-public class armTestTeleOp extends OpMode {
+
+@TeleOp(name="Alt_Test_TeleOp")
+public class altTestTeleOp extends OpMode {
 
     private DcMotor frontLeft;
     private DcMotor frontRight;
@@ -17,11 +18,10 @@ public class armTestTeleOp extends OpMode {
     private DcMotorEx leftSlide;
     private DcMotorEx rightSlide;
 
-    private DcMotor armLeft;
-    private DcMotor armRight;
+    private DcMotorEx armLeft;
+    private DcMotorEx armRight;
 
     private Servo grip;
-    private Servo gripRotation;
 
     // Acceleration control multiplier
     // Higher number = LESS smoothing
@@ -34,13 +34,7 @@ public class armTestTeleOp extends OpMode {
     // Calculate the adaptive smooth factor based on the current power
     double calculateSmoothFactor(double power) {
         double absPower = Math.abs(power);
-        double outputSmoothFactor = (1-absPower) * smoothFactor;
-        if (outputSmoothFactor < minSmooth) {
-            outputSmoothFactor = minSmooth;
-        } else if (outputSmoothFactor > maxSmooth) {
-            outputSmoothFactor = maxSmooth;
-        }
-        return outputSmoothFactor;
+        return (1-absPower) * smoothFactor;
     }
 
     // this is for using x/a to adjust the speed of the dpad
@@ -58,13 +52,11 @@ public class armTestTeleOp extends OpMode {
     static final double maxSlidesHeight = (double) 2928/360*COUNTS_PER_SLIDES_REV; // max height in ticks (Currently 4373.29333...)
     static final double minSlidesHeight = 0; // min height in ticks
 
-    int slideOffset = 0; // this is a part of a reset in case of the gt2 belt slipping
-    int armOffset = 0;
 
-    // KEEP BETWEEN (0-1}
-    double armThrottle = 0.25;
-    //Arm max position forward
-    double maxArmPos = 2137.65;
+    static final double armRear = 0;
+    double armThrottle = 0.5;
+
+    int slideOffset = 0; // this is a part of a janky reset in case of the gt2 belt slipping
 
     // these are used to keep track button releases.
     boolean a1Pressed = false;
@@ -76,13 +68,6 @@ public class armTestTeleOp extends OpMode {
     boolean x2Pressed = false;
     boolean y2Pressed = false;
     boolean lb2Pressed = false;
-    boolean rb2Pressed = false;
-
-    boolean gripOpen = false;
-    double gripPosition = 0;
-
-    boolean gripDeployed = false;
-    double rotationPosition = 0;
 
     @Override
     public void init() {
@@ -97,11 +82,10 @@ public class armTestTeleOp extends OpMode {
         leftSlide = hardwareMap.get(DcMotorEx.class, "leftSlide");
         rightSlide = hardwareMap.get(DcMotorEx.class, "rightSlide");
         // arm
-        armLeft = hardwareMap.get(DcMotor.class, "armLeft");
-        armRight = hardwareMap.get(DcMotor.class, "armRight");
-        //grip
+        armLeft = hardwareMap.get(DcMotorEx.class, "armLeft");
+        armRight = hardwareMap.get(DcMotorEx.class, "armRight");
+        //servo
         grip = hardwareMap.get(Servo.class, "grip");
-        gripRotation = hardwareMap.get(Servo.class, "gripRotation");
 
         // Hard stop
         // drive wheels
@@ -112,7 +96,7 @@ public class armTestTeleOp extends OpMode {
         // slides
         leftSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        // arm
+        //arm
         armLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         armRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -128,12 +112,11 @@ public class armTestTeleOp extends OpMode {
         armLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         armRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
         // flip left motors so everything runs forward
         frontLeft.setDirection(DcMotor.Direction.REVERSE);
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         rightSlide.setDirection(DcMotor.Direction.REVERSE);
-        armRight.setDirection(DcMotor.Direction.REVERSE);
+        armLeft.setDirection(DcMotor.Direction.REVERSE);
 
     }
 
@@ -161,10 +144,17 @@ public class armTestTeleOp extends OpMode {
         ================================================
          */
 
+        // Get square root joystick inputs for high-speed control
+        /*
+        double x = sqrtInput(gamepad1.left_stick_x);
+        double y = sqrtInput(-gamepad1.left_stick_y);  // Invert Y-axis as needed
+        double rotation = sqrtInput(gamepad1.right_stick_x);
+         */
+
         // does not use exponential joystick scaling
-        double y = gamepad1.left_stick_y * -0.8; // Move forward/backward
-        double x = gamepad1.left_stick_x * 0.8; // Strafe left/right
-        double rotation = gamepad1.right_stick_x * 0.75; // Rotate
+        double y = gamepad1.left_stick_y * -1; // Move forward/backward
+        double x = gamepad1.left_stick_x * 1; // Strafe left/right
+        double rotation = gamepad1.right_stick_x * 1; // Rotate
 
 
         /*
@@ -201,6 +191,16 @@ public class armTestTeleOp extends OpMode {
         double frontRightPower = y - x - rotation;
         double backRightPower = y + x - rotation;
 
+        /*
+        ================================================
+        Alternative method of preventing >1 power value
+        ================================================
+        // Scale the values to keep within the -1 to 1 range
+        frontLeftPower = Range.clip(frontLeftPower, -1.0, 1.0);
+        frontRightPower = Range.clip(frontRightPower, -1.0, 1.0);
+        backLeftPower = Range.clip(backLeftPower, -1.0, 1.0);
+        backRightPower = Range.clip(backRightPower, -1.0, 1.0);
+        */
 
         // This scaling will keep values proportional.
         // I still want to test which one drivers prefer.
@@ -217,9 +217,8 @@ public class armTestTeleOp extends OpMode {
         }
 
 
-        final double minSmooth = 0.05; // Minimum smoothFactor
-        final double maxSmooth = 0.95; // Maximum smoothFactor
 
+        //smoothFactor buttons
         if (gamepad1.b && smoothFactor < maxSmooth && !b1Pressed) {
             smoothFactor += smoothIncrement; // Increase smoothFactor (faster acceleration)
             b1Pressed = true;
@@ -231,21 +230,41 @@ public class armTestTeleOp extends OpMode {
 
         telemetry.addData("Smooth Factor: ", smoothFactor);
 
-         /*
+
+        // Adjust the baseSmoothFactor using buttons
+        if (gamepad1.a) {
+            smoothFactor += smoothIncrement;
+        }
+        if (gamepad1.b) {
+            smoothFactor -= smoothIncrement;
+        }
+
+        /*
         ==============================
-        Acceleration control
-        INCLUDES DECELERATION
+            Acceleration control
         ==============================
-        */
-        frontLeftPower = (1 - smoothFactor) * frontLeft.getPower() + smoothFactor * frontLeftPower;
-        backLeftPower = (1 - smoothFactor) * backLeft.getPower() + smoothFactor * backLeftPower;
-        frontRightPower = (1 - smoothFactor) * frontRight.getPower() + smoothFactor * frontRightPower;
-        backRightPower = (1 - smoothFactor) * backRight.getPower() + smoothFactor * backRightPower;
+         */
+
+        // Front Left Wheel
+        adaptiveSmoothFactor = calculateSmoothFactor(frontLeftPower);
+        frontLeftPower = (1 - adaptiveSmoothFactor) * frontLeft.getPower() + adaptiveSmoothFactor * frontLeftPower;
+
+        // Front Right Wheel
+        adaptiveSmoothFactor = calculateSmoothFactor(frontRightPower);
+        frontRightPower = (1 - adaptiveSmoothFactor) * frontRight.getPower() + adaptiveSmoothFactor * frontRightPower;
+
+        // Back Left Wheel
+        adaptiveSmoothFactor = calculateSmoothFactor(backLeftPower);
+        backLeftPower = (1 - adaptiveSmoothFactor) * backLeft.getPower() + adaptiveSmoothFactor * backLeftPower;
+
+        // Back Right Wheel
+        adaptiveSmoothFactor = calculateSmoothFactor(backRightPower);
+        backRightPower = (1 - adaptiveSmoothFactor) * backRight.getPower() + adaptiveSmoothFactor * backRightPower;
 
         /*
         ================================================
                 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-                      CONTROLLER 2 CONTROLS
+                      SLIDES CONTROLS
                 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         ================================================
          */
@@ -298,81 +317,30 @@ public class armTestTeleOp extends OpMode {
         telemetry.addData("Max Slides Height: ", maxSlidesHeight);
 
         /*
-        ===================
-             ARM CODE
-        ===================
+        ================================================
+                <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                      ARM CONTROLS
+                <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        ================================================
          */
 
-        double armPower = gamepad2.right_stick_y * armThrottle;
-        double armPos = armRight.getCurrentPosition();
-
-        /*
-        // arm limits
-        if (-armPos < 0 && armPower < 0) {
+        double armPower = gamepad2.right_stick_y;// get right stick value
+        double armPosition = armLeft.getCurrentPosition();
+        if (armPosition < armRear && armPower < 0) {
             armPower = 0;
         }
-        if (-armPos > maxArmPos && armPower > 0) {
-            armPower = 0;
-        }
-        if (-armPos > maxArmPos + 24) {
-            armPower = -0.1;
-        }
+        armPower *= armThrottle;
 
-        // reset arm to top
-        if (gamepad2.y && gamepad2.right_bumper && !y2Pressed && !lb2Pressed) {
-            armLeft.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            armRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            armLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-            armRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-            armOffset = (int) maxArmPos;
-            y2Pressed = true;
-            rb2Pressed = true;
-        }
-
-        //reset arm to bottom
-        if (gamepad2.left_bumper && gamepad2.x && !x2Pressed && !rb2Pressed) {
-            armOffset = (int) 0;
-            armLeft.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            armRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            armLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-            armRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-            rb2Pressed = true;
-            x2Pressed = true;
-        }
-        */
-
-        telemetry.addData("Left Encoder: ", armLeft.getCurrentPosition());
-        telemetry.addData("Right Encoder: ", armRight.getCurrentPosition());
-        telemetry.addData("Arm Joystick: ", gamepad2.right_stick_y);
-
-        /*
-        ========================
-             GRIPPER CODE
-        ========================
-         */
-
-        if (gamepad2.a && !a2Pressed && !gripOpen && !gamepad2.start) { // FIX POSITIONS LATER
-            gripPosition = 0.83;
+        if (gamepad2.a && !a2Pressed) {
+            grip.setPosition(0);
             a2Pressed = true;
-            gripOpen = true;
-        } else if (gamepad2.a && !a2Pressed && gripOpen && !gamepad2.start) {
-            gripPosition = 0;
-            a2Pressed = true;
-            gripOpen = false;
         }
-
-        if (gamepad2.b && !b2Pressed && !gripDeployed && !gamepad2.start) {
-            rotationPosition = 0.5;
-            gripDeployed = true;
-            b2Pressed = true;
-        } else if (gamepad2.b && !b2Pressed && gripDeployed && !gamepad2.start) {
-            rotationPosition = 0;
-            gripDeployed = false;
+        if (gamepad2.b && !b2Pressed) {
+            grip.setPosition(1);
             b2Pressed = true;
         }
 
-
-
+        telemetry.addData("Arm position: ", armPosition);
 
         /*
         ================================================
@@ -382,18 +350,6 @@ public class armTestTeleOp extends OpMode {
         ================================================
          */
 
-        maxPower = Math.max(1.0, Math.abs(frontLeftPower));
-        maxPower = Math.max(maxPower, Math.abs(backLeftPower));
-        maxPower = Math.max(maxPower, Math.abs(frontRightPower));
-        maxPower = Math.max(maxPower, Math.abs(backRightPower));
-
-        if (maxPower > 1.0) {
-            frontLeftPower /= maxPower;
-            backLeftPower /= maxPower;
-            frontRightPower /= maxPower;
-            backRightPower /= maxPower;
-        }
-
         // sends final value to the motors
         frontLeft.setPower(frontLeftPower);
         frontRight.setPower(frontRightPower);
@@ -402,9 +358,7 @@ public class armTestTeleOp extends OpMode {
         leftSlide.setPower(slidePower);
         rightSlide.setPower(slidePower);
         armLeft.setPower(armPower);
-        armRight.setPower(armPower);
-        grip.setPosition(gripPosition);
-        gripRotation.setPosition(rotationPosition);
+
 
         // these keep track of button releases
         if (!gamepad1.a) {
@@ -428,20 +382,17 @@ public class armTestTeleOp extends OpMode {
         if (!gamepad2.left_bumper) {
             lb2Pressed = false;
         }
-        if (!gamepad2.a && a2Pressed) {
+        if (!gamepad2.a) {
             a2Pressed = false;
         }
-        if (!gamepad2.b && b2Pressed) {
+        if (!gamepad2.b) {
             b2Pressed = false;
         }
-        if (!gamepad2.right_bumper && rb2Pressed) {
-            rb2Pressed = false;
-        }
-
         telemetry.update();
     }
 
     @Override
     public void stop() {
+        //runs once on stop
     }
 }

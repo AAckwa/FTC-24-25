@@ -3,11 +3,13 @@ MOTORS
         0: FRONT LEFT DRIVE
         1: BACK LEFT DRIVE
         2: LEFT SLIDE
-        3:
+        3: ARM LEFT
     EXP HUB
         0: FRONT RIGHT DRIVE
         1: BACK RIGHT DRIVE
         2: RIGHT SLIDE
-        3:
+        3: ARM RIGHT
 SERVOS
+    CMD HUB
+        0: GRIP
 

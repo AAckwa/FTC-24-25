@@ -1,20 +1,25 @@
 package org.firstinspires.ftc.teamcode;
 
-
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static java.lang.Thread.sleep;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 
 public class testAutoFrame {
+
     public DcMotorEx frontLeft;
     public DcMotorEx frontRight;
     public DcMotorEx backLeft;
     public DcMotorEx backRight;
     public DcMotorEx leftSlide;
     public DcMotorEx rightSlide;
+    public DcMotorEx armLeft;
+    public DcMotorEx armRight;
+    public Servo grip;
+    public Servo gripRotation;
 
     // GLOBAL MAXIMUM SPEED
     static final double maxThrottle = 1.0; // limits to a % of theo. max speed; ex: 0.9 makes 90% of theo. the functional max speed.
@@ -44,15 +49,26 @@ public class testAutoFrame {
     static final double minSlidesHeight = 0; // min height in ticks
     static final double maxSlidesVelocity = (slidesRPM * COUNTS_PER_SLIDES_REV * maxThrottle) / 60; // Max possible ticks per second
 
+    // arm stuff
+    static final double maxArmPos = 1911; // if start pos is 0, this (should be) 270 degrees from there.
+    static final double armRPM = 117; // RPM of the arm motors
+    static final double COUNTS_PER_ARM_REV = 1425.1;
+    static final double maxArmVelocity = (armRPM * COUNTS_PER_ARM_REV * maxThrottle) / 60; // Max possible ticks per second)
+
 
     // Constructor
-    public testAutoFrame(DcMotorEx fLeft, DcMotorEx fRight, DcMotorEx bLeft, DcMotorEx bRight, DcMotorEx lSlide, DcMotorEx rSlide) {
+    public testAutoFrame(DcMotorEx fLeft, DcMotorEx fRight, DcMotorEx bLeft, DcMotorEx bRight,
+                         DcMotorEx lSlide, DcMotorEx rSlide,DcMotorEx aLeft, DcMotorEx aRight, Servo grip, Servo gripRot) {
         frontLeft = fLeft;
         frontRight = fRight;
         backLeft = bLeft;
         backRight = bRight;
         leftSlide = lSlide;
         rightSlide = rSlide;
+        armLeft = aLeft;
+        armRight = aRight;
+        this.grip = grip;
+        gripRotation = gripRot;
 
 
         // Set motors to brake when not moving
@@ -62,10 +78,13 @@ public class testAutoFrame {
         backRight.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         leftSlide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
         rightSlide.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+        armLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        armRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         frontLeft.setDirection(DcMotorEx.Direction.REVERSE);
         backLeft.setDirection(DcMotorEx.Direction.REVERSE);
         rightSlide.setDirection(DcMotorEx.Direction.REVERSE);
+        armRight.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
         /*
@@ -78,15 +97,16 @@ public class testAutoFrame {
 
     // Wait for motors to reach their target position
     public void waitForMotors() {
-        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backRight.isBusy() || leftSlide.isBusy() || rightSlide.isBusy()){
+        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backRight.isBusy() || leftSlide.isBusy() || rightSlide.isBusy() || armLeft.isBusy() || armRight.isBusy()){
             // Wait for motors to get to position
         }
     }
 
     // Stop all motors
     public void stopMotors() {
-        setMotorVelo(0, 0, 0, 0); // Set all motor velocities to 0
+        setMotorVelo(0, 0, 0, 0); // Set drive motor velocities to 0
         setSlidesVelo(0); // Set slide velocity to 0)
+        setArmVelo(0); // Set arm velocity to 0
     }
 
         /*
@@ -174,6 +194,43 @@ public class testAutoFrame {
         leftSlide.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
         rightSlide.setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
     }
+
+        /*
+        ================================================
+                <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                          ARM METHODS
+                <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        ================================================
+        */
+
+    public void resetArm(){
+        armLeft.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        armRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+
+        try {
+            Thread.sleep(50); // Sleep for 50 ms (adjust as necessary)
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Restore the interrupted status
+            telemetry.addData("Error", "Thread was interrupted during resetArm");
+            telemetry.update();
+        }
+    }
+
+    public void setArmVelo(double velo){ //velocities are in TPS
+        armLeft.setVelocity(velo);
+        armRight.setVelocity(velo);
+    }
+
+    public void setArmPos(int position) {
+        armLeft.setTargetPosition(position);
+        armRight.setTargetPosition(position);
+    }
+
+    public void runArmToPosition() {
+        armLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
 
 
         /*
@@ -264,4 +321,43 @@ public class testAutoFrame {
 
         waitForMotors(); // Wait for motors to finish
     }
+
+    public void arm(double angle,double speed) { // Angle stays between [0,1] (starting pos is  0, forward limit is 1)
+        // arm will have a 270 degree travel limit. (ill change it if need be)
+        double armTargetPos = -angle * maxArmPos;
+        double armTargetVelocity = speed * maxArmVelocity;
+
+//        if (armTargetPos > maxArmPos) {
+//            armTargetPos = maxArmPos;
+//        } else if (armTargetPos < 0) {
+//            armTargetPos = 0;
+//        }
+
+        setArmPos((int) armTargetPos);
+
+        runArmToPosition();
+
+        setArmVelo(armTargetVelocity);
+
+        waitForMotors();
+    }
+
+
+    public void grip(boolean gripping) {
+
+        if (gripping) {
+            grip.setPosition(0);
+        } else {
+            grip.setPosition(0.83);
+        }
+    }
+
+    public void gripRotate(boolean deployed) {
+        if (deployed) {
+            gripRotation.setPosition(0.67);
+        } else {
+            gripRotation.setPosition(0.0);
+        }
+    }
+
 }

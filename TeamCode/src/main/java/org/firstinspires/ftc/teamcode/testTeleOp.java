@@ -19,8 +19,23 @@ public class testTeleOp extends OpMode {
 
     // Acceleration control multiplier
     // Higher number = LESS smoothing
-    double smoothFactor = 0.8;
+    double smoothFactor = 1;
     final double smoothIncrement = 0.05; // How much smoothFactor changes with each button press
+    final double minSmooth = 0; // Minimum smoothFactor
+    final double maxSmooth = 1; // Maximum smoothFactor
+    double adaptiveSmoothFactor;
+
+    // Calculate the adaptive smooth factor based on the current power
+    double calculateSmoothFactor(double power) {
+        double absPower = Math.abs(power);
+        double outputSmoothFactor = (1-absPower) * smoothFactor;
+        if (outputSmoothFactor < minSmooth) {
+            outputSmoothFactor = minSmooth;
+        } else if (outputSmoothFactor > maxSmooth) {
+            outputSmoothFactor = maxSmooth;
+        }
+        return outputSmoothFactor;
+    }
 
     // this is for using x/a to adjust the speed of the dpad
     double dpadSpeed = 0.2;
@@ -44,7 +59,9 @@ public class testTeleOp extends OpMode {
     boolean b1Pressed = false;
     boolean x1Pressed = false;
     boolean y1Pressed = false;
+    boolean x2Pressed = false;
     boolean y2Pressed = false;
+    boolean lb2Pressed = false;
 
     @Override
     public void init() {
@@ -182,9 +199,8 @@ public class testTeleOp extends OpMode {
         }
 
 
-        final double minSmooth = 0.05; // Minimum smoothFactor
-        final double maxSmooth = 0.95; // Maximum smoothFactor
 
+        //smoothFactor buttons
         if (gamepad1.b && smoothFactor < maxSmooth && !b1Pressed) {
             smoothFactor += smoothIncrement; // Increase smoothFactor (faster acceleration)
             b1Pressed = true;
@@ -197,42 +213,29 @@ public class testTeleOp extends OpMode {
         telemetry.addData("Smooth Factor: ", smoothFactor);
 
 
+        // Adjust the baseSmoothFactor using buttons
 
-
-
-        //=========================
-        // Acceleration control
-        // EXCLUDES DECELERATION
-        //=========================
-
-        // if the current power is greater than the target power, limit acceleration.
-        // else, do nothing (do not limit deceleration)
-        // Apply smoothing for **acceleration only**, no limit on deceleration
         /*
-        if (Math.abs(frontLeftPower) > Math.abs(frontLeft.getPower())) {
-            frontLeftPower = (1 - smoothFactor) * frontLeft.getPower() + smoothFactor * frontLeftPower;
-        }
-        if (Math.abs(backLeftPower) > Math.abs(backLeft.getPower())) {
-            backLeftPower = (1 - smoothFactor) * backLeft.getPower() + smoothFactor * backLeftPower;
-        }
-        if (Math.abs(frontRightPower) > Math.abs(frontRight.getPower())) {
-            frontRightPower = (1 - smoothFactor) * frontRight.getPower() + smoothFactor * frontRightPower;
-        }
-        if (Math.abs(backRightPower) > Math.abs(backRight.getPower())) {
-            backRightPower = (1 - smoothFactor) * backRight.getPower() + smoothFactor * backRightPower;
-        }
-        */
+        ==============================
+            Acceleration control
+        ==============================
+         */
 
-         /*
-        ==============================
-        Acceleration control
-        INCLUDES DECELERATION
-        ==============================
-        */
-        frontLeftPower = (1 - smoothFactor) * frontLeft.getPower() + smoothFactor * frontLeftPower;
-        backLeftPower = (1 - smoothFactor) * backLeft.getPower() + smoothFactor * backLeftPower;
-        frontRightPower = (1 - smoothFactor) * frontRight.getPower() + smoothFactor * frontRightPower;
-        backRightPower = (1 - smoothFactor) * backRight.getPower() + smoothFactor * backRightPower;
+        // Front Left Wheel
+        adaptiveSmoothFactor = calculateSmoothFactor(frontLeftPower);
+        frontLeftPower = (1 - adaptiveSmoothFactor) * frontLeft.getPower() + adaptiveSmoothFactor * frontLeftPower;
+
+        // Front Right Wheel
+        adaptiveSmoothFactor = calculateSmoothFactor(frontRightPower);
+        frontRightPower = (1 - adaptiveSmoothFactor) * frontRight.getPower() + adaptiveSmoothFactor * frontRightPower;
+
+        // Back Left Wheel
+        adaptiveSmoothFactor = calculateSmoothFactor(backLeftPower);
+        backLeftPower = (1 - adaptiveSmoothFactor) * backLeft.getPower() + adaptiveSmoothFactor * backLeftPower;
+
+        // Back Right Wheel
+        adaptiveSmoothFactor = calculateSmoothFactor(backRightPower);
+        backRightPower = (1 - adaptiveSmoothFactor) * backRight.getPower() + adaptiveSmoothFactor * backRightPower;
 
         /*
         ================================================
@@ -264,6 +267,28 @@ public class testTeleOp extends OpMode {
             slidePower *= 0.1;
         }
 
+        // reset slides to top
+        if (gamepad2.y && gamepad2.left_bumper && !y2Pressed && !lb2Pressed) {
+            leftSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+            rightSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+            leftSlide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            rightSlide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            slideOffset = (int) maxSlidesHeight;
+            y2Pressed = true;
+            lb2Pressed = true;
+        }
+
+        //reset slides to bottom
+        if (gamepad2.left_bumper && gamepad2.x && !x2Pressed && !lb2Pressed) {
+            slideOffset = (int) minSlidesHeight;
+            leftSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+            rightSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+            leftSlide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            rightSlide.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+            lb2Pressed = true;
+            x2Pressed = true;
+        }
+
         telemetry.addData("Slides position: ", slideCurrentPosition);
         telemetry.addData("Max Slides Height: ", maxSlidesHeight);
 
@@ -274,6 +299,18 @@ public class testTeleOp extends OpMode {
                 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
         ================================================
          */
+
+        maxPower = Math.max(1.0, Math.abs(frontLeftPower));
+        maxPower = Math.max(maxPower, Math.abs(backLeftPower));
+        maxPower = Math.max(maxPower, Math.abs(frontRightPower));
+        maxPower = Math.max(maxPower, Math.abs(backRightPower));
+
+        if (maxPower > 1.0) {
+            frontLeftPower /= maxPower;
+            backLeftPower /= maxPower;
+            frontRightPower /= maxPower;
+            backRightPower /= maxPower;
+        }
 
         // sends final value to the motors
         frontLeft.setPower(frontLeftPower);
@@ -296,8 +333,14 @@ public class testTeleOp extends OpMode {
         if (!gamepad1.y) {
             y1Pressed = false;
         }
+        if (!gamepad2.x) {
+            x2Pressed = false;
+        }
         if (!gamepad2.y) {
             y2Pressed = false;
+        }
+        if (!gamepad2.left_bumper) {
+            lb2Pressed = false;
         }
 
         telemetry.update();
@@ -306,5 +349,9 @@ public class testTeleOp extends OpMode {
     @Override
     public void stop() {
         //runs once on stop
+        leftSlide.setTargetPosition(-40);
+        rightSlide.setTargetPosition(-40);
+        leftSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        rightSlide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 }

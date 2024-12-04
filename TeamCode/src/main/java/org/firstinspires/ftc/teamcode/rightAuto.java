@@ -1,14 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name="Production_Auto")
-public class productionAuto extends LinearOpMode {
+@Autonomous(name="Right Auto")
+public class rightAuto extends LinearOpMode {
 
-    private autoFrame kevinFrame;
+    private  testAutoFrame kevinFrame;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -23,7 +23,7 @@ public class productionAuto extends LinearOpMode {
         Servo grip = hardwareMap.get(Servo.class, "grip");
         Servo gripRotation = hardwareMap.get(Servo.class, "gripRotation");
 
-        kevinFrame = new autoFrame(frontLeft,frontRight,backLeft,backRight,leftSlide,rightSlide,armLeft,armRight,grip,gripRotation);
+        kevinFrame = new testAutoFrame(frontLeft,frontRight,backLeft,backRight,leftSlide,rightSlide,armLeft,armRight,grip,gripRotation);
 
         waitForStart();
 
@@ -31,17 +31,7 @@ public class productionAuto extends LinearOpMode {
         kevinFrame.resetSlides();
         kevinFrame.resetArm();
 
-        kevinFrame.forward(13.05,0.25);
-        kevinFrame.right(18,0.25);
-        kevinFrame.slides(0.26,0.25);
-        kevinFrame.arm(0.5,0.25);
-        kevinFrame.gripRotate(true);
-        sleep(200);
-        kevinFrame.arm(0.83,0.25);
-        kevinFrame.grip(false);
-        sleep(200);
-        kevinFrame.forward(-5,0.25);
-        kevinFrame.gripRotate(false);kevinFrame.arm(0,0.25);
+        kevinFrame.right(45,0.25);
 
 
 
