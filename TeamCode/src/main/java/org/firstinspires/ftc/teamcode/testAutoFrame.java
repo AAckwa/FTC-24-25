@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+//import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static java.lang.Thread.sleep;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -58,7 +58,7 @@ public class testAutoFrame {
 
     // Constructor
     public testAutoFrame(DcMotorEx fLeft, DcMotorEx fRight, DcMotorEx bLeft, DcMotorEx bRight,
-                         DcMotorEx lSlide, DcMotorEx rSlide,DcMotorEx aLeft, DcMotorEx aRight, Servo grip, Servo gripRot) {
+                     DcMotorEx lSlide, DcMotorEx rSlide,DcMotorEx aLeft, DcMotorEx aRight, Servo gripper, Servo gripRot) {
         frontLeft = fLeft;
         frontRight = fRight;
         backLeft = bLeft;
@@ -67,7 +67,7 @@ public class testAutoFrame {
         rightSlide = rSlide;
         armLeft = aLeft;
         armRight = aRight;
-        this.grip = grip;
+        grip = gripper;
         gripRotation = gripRot;
 
 
@@ -97,8 +97,10 @@ public class testAutoFrame {
 
     // Wait for motors to reach their target position
     public void waitForMotors() {
-        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backRight.isBusy() || leftSlide.isBusy() || rightSlide.isBusy() || armLeft.isBusy() || armRight.isBusy()){
+        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backRight.isBusy()){
             // Wait for motors to get to position
+
+            // hold code:  || leftSlide.isBusy() || rightSlide.isBusy() || armLeft.isBusy() || armRight.isBusy()
         }
     }
 
@@ -125,11 +127,11 @@ public class testAutoFrame {
         backRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         try {
-            Thread.sleep(50); // Sleep for 50 ms (adjust as necessary)
+            sleep(50); // Sleep for 50 ms (adjust as necessary)
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); // Restore the interrupted status
-            telemetry.addData("Error", "Thread was interrupted during resetEncoders");
-            telemetry.update();
+//            telemetry.addData("Error", "Thread was interrupted during resetEncoders");
+//            telemetry.update();
         }
     }
     // Method to set target position for each motor
@@ -170,11 +172,11 @@ public class testAutoFrame {
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         try {
-            Thread.sleep(50); // Sleep for 50 ms (adjust as necessary)
+            sleep(50); // Sleep for 50 ms (adjust as necessary)
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); // Restore the interrupted status
-            telemetry.addData("Error", "Thread was interrupted during resetSlides");
-            telemetry.update();
+//            telemetry.addData("Error", "Thread was interrupted during resetSlides");
+//            telemetry.update();
         }
     }
 
@@ -208,11 +210,11 @@ public class testAutoFrame {
         armRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         try {
-            Thread.sleep(50); // Sleep for 50 ms (adjust as necessary)
+            sleep(50); // Sleep for 50 ms (adjust as necessary)
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); // Restore the interrupted status
-            telemetry.addData("Error", "Thread was interrupted during resetArm");
-            telemetry.update();
+//            telemetry.addData("Error", "Thread was interrupted during resetArm");
+//            telemetry.update();
         }
     }
 
@@ -319,7 +321,7 @@ public class testAutoFrame {
 
         setSlidesVelo(targetVelo);
 
-        waitForMotors(); // Wait for motors to finish
+//        waitForMotors(); // Wait for motors to finish
     }
 
     public void arm(double angle,double speed) { // Angle stays between [0,1] (starting pos is  0, forward limit is 1)
@@ -333,13 +335,17 @@ public class testAutoFrame {
 //            armTargetPos = 0;
 //        }
 
+        if (armTargetPos >= 0) {
+            armTargetPos = 1;
+        }
+
         setArmPos((int) armTargetPos);
 
         runArmToPosition();
 
         setArmVelo(armTargetVelocity);
 
-        waitForMotors();
+//        waitForMotors();
     }
 
 

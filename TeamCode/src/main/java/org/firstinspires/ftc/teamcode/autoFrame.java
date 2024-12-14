@@ -1,6 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
-import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+//import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static java.lang.Thread.sleep;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -97,8 +97,10 @@ public class autoFrame {
 
     // Wait for motors to reach their target position
     public void waitForMotors() {
-        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backRight.isBusy() || leftSlide.isBusy() || rightSlide.isBusy() || armLeft.isBusy() || armRight.isBusy()){
+        while (frontLeft.isBusy() || frontRight.isBusy() || backLeft.isBusy() || backRight.isBusy()){
             // Wait for motors to get to position
+
+            // hold code:  || leftSlide.isBusy() || rightSlide.isBusy() || armLeft.isBusy() || armRight.isBusy()
         }
     }
 
@@ -125,11 +127,11 @@ public class autoFrame {
         backRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         try {
-            Thread.sleep(50); // Sleep for 50 ms (adjust as necessary)
+            sleep(50); // Sleep for 50 ms (adjust as necessary)
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); // Restore the interrupted status
-            telemetry.addData("Error", "Thread was interrupted during resetEncoders");
-            telemetry.update();
+//            telemetry.addData("Error", "Thread was interrupted during resetEncoders");
+//            telemetry.update();
         }
     }
     // Method to set target position for each motor
@@ -170,11 +172,11 @@ public class autoFrame {
         rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         try {
-            Thread.sleep(50); // Sleep for 50 ms (adjust as necessary)
+            sleep(50); // Sleep for 50 ms (adjust as necessary)
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); // Restore the interrupted status
-            telemetry.addData("Error", "Thread was interrupted during resetSlides");
-            telemetry.update();
+//            telemetry.addData("Error", "Thread was interrupted during resetSlides");
+//            telemetry.update();
         }
     }
 
@@ -208,11 +210,11 @@ public class autoFrame {
         armRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
 
         try {
-            Thread.sleep(50); // Sleep for 50 ms (adjust as necessary)
+            sleep(50); // Sleep for 50 ms (adjust as necessary)
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt(); // Restore the interrupted status
-            telemetry.addData("Error", "Thread was interrupted during resetArm");
-            telemetry.update();
+//            telemetry.addData("Error", "Thread was interrupted during resetArm");
+//            telemetry.update();
         }
     }
 
@@ -319,7 +321,7 @@ public class autoFrame {
 
         setSlidesVelo(targetVelo);
 
-        waitForMotors(); // Wait for motors to finish
+//        waitForMotors(); // Wait for motors to finish
     }
 
     public void arm(double angle,double speed) { // Angle stays between [0,1] (starting pos is  0, forward limit is 1)
@@ -339,7 +341,7 @@ public class autoFrame {
 
         setArmVelo(armTargetVelocity);
 
-        waitForMotors();
+//        waitForMotors();
     }
 
 

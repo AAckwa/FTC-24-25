@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -62,7 +65,7 @@ public class productionTeleOp extends OpMode {
     int armOffset = 0;
 
     // KEEP BETWEEN (0-1}
-    double armThrottle = 0.25;
+    double armThrottle = 0.5; // Don't forget to change it in the loop too!
     //Arm max position forward
     double maxArmPos = 2137.65;
 
@@ -83,6 +86,10 @@ public class productionTeleOp extends OpMode {
 
     boolean gripDeployed = false;
     double rotationPosition = 0;
+
+    boolean ascentMode = false;
+
+    TelemetryPacket packet = new TelemetryPacket();
 
     @Override
     public void init() {
@@ -134,6 +141,8 @@ public class productionTeleOp extends OpMode {
         backLeft.setDirection(DcMotor.Direction.REVERSE);
         rightSlide.setDirection(DcMotor.Direction.REVERSE);
         armRight.setDirection(DcMotor.Direction.REVERSE);
+
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
     }
 
@@ -259,17 +268,19 @@ public class productionTeleOp extends OpMode {
         prevents bottoming out slides too fast
         =======================================
          */
-        if (slideCurrentPosition > maxSlidesHeight && slidePower > 0) {
+        if (!ascentMode) {
+            if (slideCurrentPosition >= maxSlidesHeight * 0.9 && slidePower > 0) { //these are limits to prevent slamming into hard limits
+                slidePower *= 0.1;
+            }
+            if (slideCurrentPosition <= maxSlidesHeight * 0.1 && slidePower < 0) {
+                slidePower *= 0.1;
+            }
+        }
+        if (slideCurrentPosition > maxSlidesHeight && slidePower > 0) { //These are hard limits
             slidePower = 0;
         }
         if (slideCurrentPosition < minSlidesHeight && slidePower < 0) {
             slidePower = 0;
-        }
-        if (slideCurrentPosition >= maxSlidesHeight * 0.9 && slidePower > 0) {
-            slidePower *= 0.1;
-        }
-        if (slideCurrentPosition <= maxSlidesHeight * 0.1 && slidePower < 0) {
-            slidePower *= 0.1;
         }
 
         // reset slides to top
@@ -303,43 +314,14 @@ public class productionTeleOp extends OpMode {
         ===================
          */
 
+        if (ascentMode) {
+            armThrottle = 1;
+        } else {
+            armThrottle = 0.5;// Don't forget to change it up top as well!
+        }
+
+
         double armPower = gamepad2.right_stick_y * armThrottle;
-        double armPos = armRight.getCurrentPosition();
-
-        /*
-        // arm limits
-        if (-armPos < 0 && armPower < 0) {
-            armPower = 0;
-        }
-        if (-armPos > maxArmPos && armPower > 0) {
-            armPower = 0;
-        }
-        if (-armPos > maxArmPos + 24) {
-            armPower = -0.1;
-        }
-
-        // reset arm to top
-        if (gamepad2.y && gamepad2.right_bumper && !y2Pressed && !lb2Pressed) {
-            armLeft.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            armRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            armLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-            armRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-            armOffset = (int) maxArmPos;
-            y2Pressed = true;
-            rb2Pressed = true;
-        }
-
-        //reset arm to bottom
-        if (gamepad2.left_bumper && gamepad2.x && !x2Pressed && !rb2Pressed) {
-            armOffset = (int) 0;
-            armLeft.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            armRight.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-            armLeft.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-            armRight.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-            rb2Pressed = true;
-            x2Pressed = true;
-        }
-        */
 
         telemetry.addData("Left Encoder: ", armLeft.getCurrentPosition());
         telemetry.addData("Right Encoder: ", armRight.getCurrentPosition());
@@ -371,7 +353,15 @@ public class productionTeleOp extends OpMode {
             b2Pressed = true;
         }
 
-
+        if (gamepad2.right_bumper&& !rb2Pressed){
+            rb2Pressed = true;
+            if (ascentMode){ // This is a toggle for the ascent mode. it will remove the throttle limiters on controller 2
+                ascentMode = false;
+            } else {
+                ascentMode = true;
+            }
+        }
+        telemetry.addData("Ascent Mode: ", ascentMode);
 
 
         /*
