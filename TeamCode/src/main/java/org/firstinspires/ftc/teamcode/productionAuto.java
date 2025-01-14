@@ -31,25 +31,34 @@ public class productionAuto extends LinearOpMode {
         kevinFrame.resetSlides();
         kevinFrame.resetArm();
 
-        kevinFrame.grip(true);
-        kevinFrame.forward(10,0.25);
-        kevinFrame.right(-33,0.25);
-        kevinFrame.rotate(45,0.25);
         kevinFrame.arm(0.5,0.5);
-        sleep(1000);
-        kevinFrame.gripRotate(true); // Arrive at baskets
-        kevinFrame.slides(0.75,0.75);
-        sleep(1500);
-        kevinFrame.arm(0.17,0.5);
-        sleep(1000);
-        kevinFrame.grip(false); // Drop preload
-        sleep(400);
-        kevinFrame.arm(0.5,0.5);
-        sleep(500);
-        kevinFrame.slides(0,0.75);
-        sleep(2000);
-        kevinFrame.forward(11,0.25);
-        kevinFrame.rotate(135,0.25);
+
+        while (armLeft.isBusy()){
+            telemetry.addData("realPos: ",armLeft.getCurrentPosition());
+            int javier = armLeft.getTargetPosition();
+            telemetry.addData("position: ",javier);
+            telemetry.update();
+        }
+
+//        kevinFrame.grip(true);
+//        kevinFrame.forward(10,0.25);
+//        kevinFrame.right(-33,0.25);
+//        kevinFrame.rotate(45,0.25);
+//        kevinFrame.arm(0.5,0.5);
+//        sleep(1000);
+//        kevinFrame.gripRotate(true); // Arrive at baskets
+//        kevinFrame.slides(0.75,0.75);
+//        sleep(1500);
+//        kevinFrame.arm(0.17,0.5);
+//        sleep(1000);
+//        kevinFrame.grip(false); // Drop preload
+//        sleep(400);
+//        kevinFrame.arm(0.5,0.5);
+//        sleep(500);
+//        kevinFrame.slides(0,0.75);
+//        sleep(2000);
+//        kevinFrame.forward(11,0.25);
+//        kevinFrame.rotate(135,0.25);
 //        kevinFrame.arm(0,0.5);
 //        //kevinFrame.forward(-9,0.25);
 //        kevinFrame.grip(true);

@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+
 //import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
 import static java.lang.Thread.sleep;
 
@@ -22,7 +23,7 @@ public class autoFrame {
     public Servo gripRotation;
 
     // GLOBAL MAXIMUM SPEED
-    static final double maxThrottle = 1.0; // limits to a % of theo. max speed; ex: 0.9 makes 90% of theo. the functional max speed.
+    static final double maxThrottle = 0.8; // limits to a % of theo. max speed; ex: 0.9 makes 90% of theo. the functional max speed.
 
     /*
          Constants for encoder calculations
@@ -50,9 +51,9 @@ public class autoFrame {
     static final double maxSlidesVelocity = (slidesRPM * COUNTS_PER_SLIDES_REV * maxThrottle) / 60; // Max possible ticks per second
 
     // arm stuff
-    static final double maxArmPos = 1911; // if start pos is 0, this (should be) 270 degrees from there.
-    static final double armRPM = 117; // RPM of the arm motors
-    static final double COUNTS_PER_ARM_REV = 1425.1;
+    static final double maxArmPos = 4100; // if start pos is 0, this (should be) 270 degrees from there.
+    static final double armRPM = 60; // RPM of the arm motors
+    static final double COUNTS_PER_ARM_REV = 2786.2;
     static final double maxArmVelocity = (armRPM * COUNTS_PER_ARM_REV * maxThrottle) / 60; // Max possible ticks per second)
 
 
@@ -226,6 +227,7 @@ public class autoFrame {
     public void setArmPos(int position) {
         armLeft.setTargetPosition(position);
         armRight.setTargetPosition(position);
+
     }
 
     public void runArmToPosition() {
