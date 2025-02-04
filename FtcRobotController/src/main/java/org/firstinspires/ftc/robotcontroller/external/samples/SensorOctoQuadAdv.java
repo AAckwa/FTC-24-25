@@ -142,8 +142,8 @@ class OctoSwerveDrive {
     private final List<OctoSwerveModule> allModules = new ArrayList<>();
 
     // members to hold encoder data for each module.
-    public final OctoSwerveModule frontLeft;
-    public final OctoSwerveModule frontRight;
+    public final OctoSwerveModule LeftFront;
+    public final OctoSwerveModule RightFront;
     public final OctoSwerveModule LeftBack;
     public final OctoSwerveModule RightBack;
 
@@ -173,8 +173,8 @@ class OctoSwerveDrive {
         // Rebuild and deploy the new code.  Verify that the telemetry now indicates 0 degrees when the wheels are facing forward.
         // Also verify that the correct module values change appropriately when you manually spin (drive) and rotate (steer) a wheel.
 
-        allModules.add(frontLeft  = new OctoSwerveModule(octoquad, "LF ",0,0));//  Drive = 0, Steer = 4
-        allModules.add(frontRight = new OctoSwerveModule(octoquad, "RF ",1,0));//  Drive = 1, Steer = 5
+        allModules.add(LeftFront  = new OctoSwerveModule(octoquad, "LF ",0,0));//  Drive = 0, Steer = 4
+        allModules.add(RightFront = new OctoSwerveModule(octoquad, "RF ",1,0));//  Drive = 1, Steer = 5
         allModules.add(LeftBack   = new OctoSwerveModule(octoquad, "LB ",2,0));//  Drive = 2, Steer = 6
         allModules.add(RightBack  = new OctoSwerveModule(octoquad, "RB ",3,0));//  Drive = 3, Steer = 7
 

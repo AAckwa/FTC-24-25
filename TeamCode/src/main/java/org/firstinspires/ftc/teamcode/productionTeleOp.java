@@ -129,6 +129,8 @@ public class productionTeleOp extends OpMode {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         //slides
+        leftSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+        rightSlide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
         leftSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //arm

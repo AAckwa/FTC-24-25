@@ -9,9 +9,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive; // RoadRunner
 
-@Autonomous(name="First Road Runner Auto")
-public class FirstRoadRunnerAuto extends LinearOpMode {
-
+@Autonomous (name="Third Road Runner Auto")
+public class thirdRoadRunnerAuto extends LinearOpMode {
     private autoFrame kevinFrame;
 
     @Override
@@ -31,23 +30,32 @@ public class FirstRoadRunnerAuto extends LinearOpMode {
         SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         kevinFrame = new autoFrame(frontLeft,frontRight,backLeft,backRight,leftSlide,rightSlide,armLeft,armRight,grip,gripRotation);
 
-        Pose2d startPose = new Pose2d();
+        Pose2d startPose = new Pose2d(0,0,Math.toRadians(-90));
 
         drive.setPoseEstimate(startPose);
 
-        Trajectory myTrajectory1 = drive.trajectoryBuilder(startPose)
-                .lineToConstantHeading(new Vector2d(9,33))
+        Trajectory myTrajectory1 = drive.trajectoryBuilder(startPose) // to preload drop
+                .lineToLinearHeading(new Pose2d(9,33,Math.toRadians(-45)))
                 .build();
 
-        Trajectory myTrajectory2 = drive.trajectoryBuilder(myTrajectory1.end().plus(new Pose2d(0,0,Math.toRadians(-45))))
+        Trajectory myTrajectory2 = drive.trajectoryBuilder(myTrajectory1.end()) // to floor 1 pickup
 
-                .lineToLinearHeading(new Pose2d(13,28.5,Math.toRadians(0)))
+                .lineToLinearHeading(new Pose2d(14.5,28,Math.toRadians(0)))
                 .build();
 
-        Trajectory myTrajectory3 = drive.trajectoryBuilder(myTrajectory2.end())
-                .lineToConstantHeading(new Vector2d(9, 32))
+        Trajectory myTrajectory3 = drive.trajectoryBuilder(myTrajectory2.end()) // to floor 1 drop
+                .lineToLinearHeading(new Pose2d(9, 33,Math.toRadians(-45)))
                 .build();
-        
+
+        Trajectory myTrajectory4 = drive.trajectoryBuilder(myTrajectory3.end()) // to floor 2 pickup
+                .lineToLinearHeading(new Pose2d(14.5,41,Math.toRadians(0)))
+                .build();
+
+        Trajectory myTrajectory5 = drive.trajectoryBuilder(myTrajectory4.end()) // to floor 2 drop
+                .lineToLinearHeading(new Pose2d(9, 33,Math.toRadians(-45)))
+                .build();
+
+
 
 
 
@@ -60,10 +68,11 @@ public class FirstRoadRunnerAuto extends LinearOpMode {
         kevinFrame.resetArm();
         kevinFrame.resetSlides();
 
+        kevinFrame.arm(0.5,0.5);
+
         drive.followTrajectory(myTrajectory1);
-        drive.turn(Math.toRadians(-45));
-        kevinFrame.arm(0.5,0.5); // BEGIN PRELOAD DROP
-        sleep(1000);
+
+
         kevinFrame.gripRotate(true);
         kevinFrame.slides(0.75,0.75);
         sleep(1500);
@@ -75,15 +84,17 @@ public class FirstRoadRunnerAuto extends LinearOpMode {
         sleep(500);
         kevinFrame.slides(0,0.75);
         sleep(1000); // END PRELOAD DROP
+
         drive.followTrajectory(myTrajectory2);
+
         kevinFrame.arm(0.95,0.5); // BEGIN FLOOR 1 PICKUP
         sleep(1500);
         kevinFrame.grip(true);
         sleep(800);
         kevinFrame.arm(0.5,0.5); // END FLOOR 1 PICKUP
+
         drive.followTrajectory(myTrajectory3);
-        drive.turn(Math.toRadians(-45));
-        kevinFrame.gripRotate(true);
+
         kevinFrame.slides(0.75,0.75);
         sleep(1500);
         kevinFrame.arm(0.17,0.5);
@@ -93,7 +104,28 @@ public class FirstRoadRunnerAuto extends LinearOpMode {
         kevinFrame.arm(0.5,0.5);
         sleep(500);
         kevinFrame.slides(0,0.75); // END FLOOR 1 DROP
-        sleep(2000);
+        sleep(1000);
+
+        drive.followTrajectory(myTrajectory4);
+
+        kevinFrame.arm(0.95,0.5); // BEGIN FLOOR 2 PICKUP
+        sleep(1500);
+        kevinFrame.grip(true);
+        sleep(800);
+        kevinFrame.arm(0.5,0.5); // END FLOOR 2 PICKUP
+
+        drive.followTrajectory(myTrajectory5);
+
+        kevinFrame.slides(0.75,0.75);
+        sleep(1500);
+        kevinFrame.arm(0.17,0.5);
+        sleep(1000);
+        kevinFrame.grip(false);
+        sleep(400);
+        kevinFrame.arm(0.5,0.5);
+        sleep(500);
+        kevinFrame.slides(0,0.75); // END FLOOR 2 DROP
+        sleep(1000);
 
     }
 
