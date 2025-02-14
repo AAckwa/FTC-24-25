@@ -65,7 +65,7 @@ public class productionTeleOp extends OpMode {
     int armOffset = 0;
 
     // KEEP BETWEEN (0-1}
-    double armThrottle = 0.5; // Don't forget to change it in the loop too!
+    double armThrottle = 1; // Don't forget to change it in the loop too!
     //Arm max position forward
     double maxArmPos = 2137.65;
 
@@ -319,7 +319,7 @@ public class productionTeleOp extends OpMode {
         if (ascentMode) {
             armThrottle = 1;
         } else {
-            armThrottle = 0.5;// Don't forget to change it up top as well!
+            armThrottle = 1;// Don't forget to change it up top as well!
         }
 
 

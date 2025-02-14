@@ -23,7 +23,7 @@ public class autoFrame {
     public Servo gripRotation;
 
     // GLOBAL MAXIMUM SPEED
-    static final double maxThrottle = 0.8; // limits to a % of theo. max speed; ex: 0.9 makes 90% of theo. the functional max speed.
+    static final double maxThrottle = 1; // limits to a % of theo. max speed; ex: 0.9 makes 90% of theo. the functional max speed.
 
     /*
          Constants for encoder calculations

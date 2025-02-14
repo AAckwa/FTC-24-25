@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d; // RoadRunner
-import com.acmerobotics.roadrunner.geometry.Vector2d; // RoadRunner
 import com.acmerobotics.roadrunner.trajectory.Trajectory; // RoadRunner
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -9,8 +8,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive; // RoadRunner
 
-@Autonomous (name="Third Road Runner Auto")
-public class thirdRoadRunnerAuto extends LinearOpMode {
+@Autonomous (name="_Basket Auto")
+public class basketAuto extends LinearOpMode {
     private autoFrame kevinFrame;
 
     @Override
