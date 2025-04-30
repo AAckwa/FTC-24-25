@@ -47,7 +47,7 @@ public class productionTeleOp extends OpMode {
     }
 
     // this is for using x/a to adjust the speed of the dpad
-    double dpadSpeed = 0.2;
+    double dpadSpeed = 0.45;
     final double minDpadSpeed = 0.05;
 
     //used for exponential joystick scaling
@@ -65,7 +65,7 @@ public class productionTeleOp extends OpMode {
     int armOffset = 0;
 
     // KEEP BETWEEN (0-1}
-    double armThrottle = 1; // Don't forget to change it in the loop too!
+    double armThrottle = 0.6; // Don't forget to change it in the loop too!
     //Arm max position forward
     double maxArmPos = 2137.65;
 
@@ -319,7 +319,7 @@ public class productionTeleOp extends OpMode {
         if (ascentMode) {
             armThrottle = 1;
         } else {
-            armThrottle = 1;// Don't forget to change it up top as well!
+            armThrottle = 0.6;// Don't forget to change it up top as well!
         }
 
 

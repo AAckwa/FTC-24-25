@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive; // RoadRunner
 
-@Autonomous (name="_Chamber Auto")
+@Autonomous (name="AAA_Chamber Auto")
 public class chamberAuto extends LinearOpMode {
     private autoFrame kevinFrame;
 
@@ -60,21 +60,21 @@ public class chamberAuto extends LinearOpMode {
                 .lineToConstantHeading(new Vector2d(19,-3))
                 .build();
 
-        Trajectory myTrajectory7 = drive.trajectoryBuilder(myTrajectory6.end()) // to HP 2 Pickup
-                .lineToLinearHeading(new Pose2d(-4,-40.5,Math.toRadians(90)))
+        Trajectory myTrajectory7 = drive.trajectoryBuilder(myTrajectory6.end()) // to Park
+                .lineToLinearHeading(new Pose2d(-4.5,-50.5,Math.toRadians(90)))
                 .build();
 
-        Trajectory myTrajectory8 = drive.trajectoryBuilder(myTrajectory7.end()) // to HP 2 score Part 1
-                .lineToLinearHeading(new Pose2d(10,3,Math.toRadians(180)))
-                .build();
-
-        Trajectory myTrajectory9 = drive.trajectoryBuilder(myTrajectory8.end()) // to HP 2 score Part 2
-                .lineToConstantHeading(new Vector2d(32 ,3))
-                .build();
-
-        Trajectory myTrajectory10 = drive.trajectoryBuilder(myTrajectory9.end()) // score HP 2
-                .lineToConstantHeading(new Vector2d(18.5,3))
-                .build();
+//        Trajectory myTrajectory8 = drive.trajectoryBuilder(myTrajectory7.end()) // to HP 2 score Part 1
+//                .lineToLinearHeading(new Pose2d(10,3,Math.toRadians(180)))
+//                .build();
+//
+//        Trajectory myTrajectory9 = drive.trajectoryBuilder(myTrajectory8.end()) // to HP 2 score Part 2
+//                .lineToConstantHeading(new Vector2d(32 ,3))
+//                .build();
+//
+//        Trajectory myTrajectory10 = drive.trajectoryBuilder(myTrajectory9.end()) // score HP 2
+//                .lineToConstantHeading(new Vector2d(17.5,3))
+//                .build();
 
 
         waitForStart();
@@ -90,7 +90,7 @@ public class chamberAuto extends LinearOpMode {
 
         drive.followTrajectory(myTrajectory1);
 
-        kevinFrame.arm(0.26,1);
+        kevinFrame.arm(0.28,1);
 //        sleep(200);
         drive.followTrajectory(myTrajectory2);
         kevinFrame.grip(false);
@@ -107,28 +107,31 @@ public class chamberAuto extends LinearOpMode {
         drive.followTrajectory(myTrajectory4);
         drive.followTrajectory(myTrajectory5);
 
-        kevinFrame.arm(0.26,1);
+        kevinFrame.arm(0.28,1);
 //        sleep(200);
         drive.followTrajectory(myTrajectory6);
         kevinFrame.grip(false); // END HP 1 SCORE
 
+
+        kevinFrame.arm(0.5,0.5);
         drive.followTrajectory(myTrajectory7);
 
-        kevinFrame.arm(0,1); //  HP 2 PICKUP
-        sleep(400);
-        kevinFrame.grip(true);
-        sleep(600);
-        kevinFrame.arm(0.2,1);
 
-        drive.followTrajectory(myTrajectory8);
-        drive.followTrajectory(myTrajectory9);
-
-        kevinFrame.arm(0.26,1);
-//        sleep(200);
-        drive.followTrajectory(myTrajectory10);
-        kevinFrame.grip(false); // END HP 2 SCORE
-
-        sleep(5000);
+//        kevinFrame.arm(0,1); //  HP 2 PICKUP
+//        sleep(400);
+//        kevinFrame.grip(true);
+//        sleep(600);
+//        kevinFrame.arm(0.2,1);
+//
+//        drive.followTrajectory(myTrajectory8);
+//        drive.followTrajectory(myTrajectory9);
+//
+//        kevinFrame.arm(0.26,1);
+////        sleep(200);
+//        drive.followTrajectory(myTrajectory10);
+//        kevinFrame.grip(false); // END HP 2 SCORE
+//
+//        sleep(5000);
 
 
     }

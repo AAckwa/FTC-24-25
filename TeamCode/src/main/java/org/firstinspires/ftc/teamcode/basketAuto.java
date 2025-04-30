@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive; // RoadRunner
 
-@Autonomous (name="_Basket Auto")
+@Autonomous (name="AAA_Basket Auto")
 public class basketAuto extends LinearOpMode {
     private autoFrame kevinFrame;
 
@@ -34,7 +34,7 @@ public class basketAuto extends LinearOpMode {
         drive.setPoseEstimate(startPose);
 
         Trajectory myTrajectory1 = drive.trajectoryBuilder(startPose) // to preload drop
-                .lineToLinearHeading(new Pose2d(9,33,Math.toRadians(-45)))
+                .lineToLinearHeading(new Pose2d(10,32,Math.toRadians(-45)))
                 .build();
 
         Trajectory myTrajectory2 = drive.trajectoryBuilder(myTrajectory1.end()) // to floor 1 pickup
@@ -43,7 +43,7 @@ public class basketAuto extends LinearOpMode {
                 .build();
 
         Trajectory myTrajectory3 = drive.trajectoryBuilder(myTrajectory2.end()) // to floor 1 drop
-                .lineToLinearHeading(new Pose2d(9, 33,Math.toRadians(-45)))
+                .lineToLinearHeading(new Pose2d(10, 32,Math.toRadians(-45)))
                 .build();
 
         Trajectory myTrajectory4 = drive.trajectoryBuilder(myTrajectory3.end()) // to floor 2 pickup
@@ -51,7 +51,7 @@ public class basketAuto extends LinearOpMode {
                 .build();
 
         Trajectory myTrajectory5 = drive.trajectoryBuilder(myTrajectory4.end()) // to floor 2 drop
-                .lineToLinearHeading(new Pose2d(9, 33,Math.toRadians(-45)))
+                .lineToLinearHeading(new Pose2d(10, 32,Math.toRadians(-45)))
                 .build();
 
 
